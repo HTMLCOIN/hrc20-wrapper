@@ -2,9 +2,9 @@
 /**
  * Created on November, 6th 2017
  *
- * Qtum PHP script to showcase token operations
+ * Htmlcoin PHP script to showcase token operations
  * Requires php gmp lib
- * qtumd should be started with -logevents (and -txindex if the node running this is not the one with the deposit addresses)
+ * htmlcoind should be started with -logevents (and -txindex if the node running this is not the one with the deposit addresses)
  * 
  * This script is just a showcase of how to implement QRC20 operations, it cannot be used for production
  * For your production environemnt, make sure you have all validations, and errors handling and security tested
@@ -30,15 +30,15 @@ require_once 'includes/BitcoinECDSA.php';
 
 //////////////////////////////////////////////////////////////////////////////////////////////config
 
-define("QTUM_CMD_PATH","~/qtum_new/src/./qtum-cli"); //qtum-cli path
-define("MAIN_QRC_ADDRESS","qdyNS7WwaNQELNRKZFoUVkNRttyM61u356"); //exchange main QRC wallet address
+define("HTMCOIN_CMD_PATH","~/htmlcoin_new/src/./htmlcoin-cli"); //qtum-cli path
+define("MAIN_QRC_ADDRESS","hdyNS7WwaNQELNRKZFoUVkNRttyM61u356"); //exchange main QRC wallet address
 
 define("TOKEN_CONTRACT_ADDRESS","b3d16bf4ccf764fd28325df28310f2c77aef2f2b"); //QRC contract address
 define("TOKEN_DECIMALS","8"); //QRC decimals
 define("MIN_DEPOSIT_AMOUNT",1); //Minimum deposit amount to be detected 
 define("MIN_DEPOSIT_MOVE_AMOUNT",10); //Minimum deposit amount to be moved
 define("MAX_NUMBER_OF_MOVE_DEPOSITS_PER_RUN",20); //Maximum deposits to move per moveDeposits call (to avoid mempool unconfirmed parent limitation)
-define("DEFAULT_FEE_AMOUNT",0.01); //default fee to send to deposit address before moving tokens out if the address does not have enough QTUM for gas
+define("DEFAULT_FEE_AMOUNT",0.004); //default fee to send to deposit address before moving tokens out if the address does not have enough QTUM for gas
 define("MIN_BALANCE_BEFORE_REFUND",0.002); //min QTUM balance a deposit address has to have, if not DEFAULT_FEE_AMOUNT will be sent to it
 
 define("TRANSFER_EVENT_TOPIC","ddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef");
@@ -77,20 +77,20 @@ switch($argv[1]){
 }
 function printHelp(){
     echo "Usage:".PHP_EOL;
-    echo "getNewDepositAddress: php Qrc20.php getNewDepositAddress".PHP_EOL;
-    echo "sendTokenToAddress address amount: php Qrc20.php sendTokenToAddress qVpCzEFBznr1XseP9vr7VFMfsyNNrzGBsh 112.12345678".PHP_EOL;
-    echo "getTokenBalance address: php Qrc20.php getTokenBalance qVpCzEFBznr1XseP9vr7VFMfsyNNrzGBsh".PHP_EOL;
-    echo "getAddressDeposits address startingblock: php Qrc20.php getAddressDeposits qVpCzEFBznr1XseP9vr7VFMfsyNNrzGBsh 500".PHP_EOL;
-    echo "getDepositConfirmations txid: php Qrc20.php getDepositConfirmations a5206544436b5ba31d8261f37065f43cdbceb3641a08a43bf9b45e4ac184f6f5".PHP_EOL;
-    echo "moveDeposits: php Qrc20.php moveDeposits".PHP_EOL;
+    echo "getNewDepositAddress: php Hrc20.php getNewDepositAddress".PHP_EOL;
+    echo "sendTokenToAddress address amount: php Hrc20.php sendTokenToAddress hVpCzEFBznr1XseP9vr7VFMfsyNNrzGBsh 112.12345678".PHP_EOL;
+    echo "getTokenBalance address: php Hrc20.php getTokenBalance hVpCzEFBznr1XseP9vr7VFMfsyNNrzGBsh".PHP_EOL;
+    echo "getAddressDeposits address startingblock: php Hrc20.php getAddressDeposits hVpCzEFBznr1XseP9vr7VFMfsyNNrzGBsh 500".PHP_EOL;
+    echo "getDepositConfirmations txid: php Hrc20.php getDepositConfirmations a5206544436b5ba31d8261f37065f43cdbceb3641a08a43bf9b45e4ac184f6f5".PHP_EOL;
+    echo "moveDeposits: php Hrc20.php moveDeposits".PHP_EOL;
 }
 // examples
 //echo getNewDepositAddress();
-//echo sendTokenToAddress("qVpCzEFBznr1XseP9vr7VFMfsyNNrzGBsh","112.12345678");
-//echo getTokenBalance("qdyNS7WwaNQELNRKZFoUVkNRttyM61u356");
-//print_r(getAddressDeposits("qVpCzEFBznr1XseP9vr7VFMfsyNNrzGBsh",0));
+//echo sendTokenToAddress("hVpCzEFBznr1XseP9vr7VFMfsyNNrzGBsh","112.12345678");
+//echo getTokenBalance("hdyNS7WwaNQELNRKZFoUVkNRttyM61u356");
+//print_r(getAddressDeposits("hVpCzEFBznr1XseP9vr7VFMfsyNNrzGBsh",0));
 //echo getDepositConfirmations('73f7a2dd0bc8dfc4bab9309d281edd2f9daca75883752d19fca1ac11031aac84');
-//echo getAddressBalance('qcr9qdFWEcvhy82j58LyoapkZpf5vdnzx9').PHP_EOL;
+//echo getAddressBalance('hcr9qdFWEcvhy82j58LyoapkZpf5vdnzx9').PHP_EOL;
 
 // getDepositConfirmations(): function that returns the number of confirmations of a deposit txid, it's important to check the number of confirmations before crediting the user account (recommended confirmations is 10+)
 function getDepositConfirmations($txid){
@@ -171,7 +171,7 @@ function getAddressBalance($address){
 
 function buildCmd($cmd)
 {
-    return QTUM_CMD_PATH ." ". $cmd;
+    return HTMLCOIN_CMD_PATH ." ". $cmd;
 }
 
 function sendCmd($cmd){
