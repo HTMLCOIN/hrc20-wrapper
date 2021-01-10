@@ -6,7 +6,7 @@
  * Requires php gmp lib
  * htmlcoind should be started with -logevents (and -txindex if the node running this is not the one with the deposit addresses)
  * 
- * This script is just a showcase of how to implement QRC20 operations, it cannot be used for production
+ * This script is just a showcase of how to implement HRC20 operations, it cannot be used for production
  * For your production environemnt, make sure you have all validations, and errors handling and security tested
  * 
  * @author qtum-neil
@@ -30,16 +30,16 @@ require_once 'includes/BitcoinECDSA.php';
 
 //////////////////////////////////////////////////////////////////////////////////////////////config
 
-define("HTMCOIN_CMD_PATH","~/htmlcoin_new/src/./htmlcoin-cli"); //qtum-cli path
-define("MAIN_QRC_ADDRESS","hdyNS7WwaNQELNRKZFoUVkNRttyM61u356"); //exchange main QRC wallet address
+define("HTMCOIN_CMD_PATH","~/htmlcoin_new/src/./htmlcoin-cli"); //htmlcoin-cli path
+define("MAIN_HRC_ADDRESS","hdyNS7WwaNQELNRKZFoUVkNRttyM61u356"); //exchange main HRC wallet address
 
-define("TOKEN_CONTRACT_ADDRESS","b3d16bf4ccf764fd28325df28310f2c77aef2f2b"); //QRC contract address
-define("TOKEN_DECIMALS","8"); //QRC decimals
+define("TOKEN_CONTRACT_ADDRESS","b3d16bf4ccf764fd28325df28310f2c77aef2f2b"); //HRC contract address
+define("TOKEN_DECIMALS","8"); //HRC decimals
 define("MIN_DEPOSIT_AMOUNT",1); //Minimum deposit amount to be detected 
 define("MIN_DEPOSIT_MOVE_AMOUNT",10); //Minimum deposit amount to be moved
 define("MAX_NUMBER_OF_MOVE_DEPOSITS_PER_RUN",20); //Maximum deposits to move per moveDeposits call (to avoid mempool unconfirmed parent limitation)
 define("DEFAULT_FEE_AMOUNT",0.004); //default fee to send to deposit address before moving tokens out if the address does not have enough QTUM for gas
-define("MIN_BALANCE_BEFORE_REFUND",0.002); //min QTUM balance a deposit address has to have, if not DEFAULT_FEE_AMOUNT will be sent to it
+define("MIN_BALANCE_BEFORE_REFUND",0.002); //min HTML balance a deposit address has to have, if not DEFAULT_FEE_AMOUNT will be sent to it
 
 define("TRANSFER_EVENT_TOPIC","ddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef");
 
@@ -118,7 +118,7 @@ function getAddressDeposits($depositAddress,$startingBlock){
 function sendTokenToAddress($userAddress,$amount){
     if(!validateAddress($userAddress))return false;
     if(!validateAmount($amount))return false;
-    $result=json_decode(trim(sendCmd('sendtocontract '.TOKEN_CONTRACT_ADDRESS.' '.'a9059cbb'.to32bytesArg(addressToHash160($userAddress)).to32bytesArg(addDecimals($amount)).' 0 '.DEFAULT_GAS_LIMIT.' '.DEFAULT_GAS_PRICE.' '.MAIN_QRC_ADDRESS)),true)["txid"];
+    $result=json_decode(trim(sendCmd('sendtocontract '.TOKEN_CONTRACT_ADDRESS.' '.'a9059cbb'.to32bytesArg(addressToHash160($userAddress)).to32bytesArg(addDecimals($amount)).' 0 '.DEFAULT_GAS_LIMIT.' '.DEFAULT_GAS_PRICE.' '.MAIN_HRC_ADDRESS)),true)["txid"];
     return $result;
 }
 
@@ -151,7 +151,7 @@ function moveDeposits(){
         $amount=getTokenBalance($address);
         if(validateAddress($address) && $amount>=MIN_DEPOSIT_MOVE_AMOUNT){
             if(getAddressBalance($address)<MIN_BALANCE_BEFORE_REFUND)sendCmd('sendtoaddress '.$address.' '.DEFAULT_FEE_AMOUNT); // send qtum fee to the depositAddress so we can move the token out
-            $results[]=array('from'=>$address,'to'=>MAIN_QRC_ADDRESS,'Tokens'=>$amount,'txid'=>json_decode(trim(sendCmd('sendtocontract '.TOKEN_CONTRACT_ADDRESS.' '.'a9059cbb'.to32bytesArg(addressToHash160(MAIN_QRC_ADDRESS)).to32bytesArg(addDecimals($amount)).' 0 '.DEFAULT_GAS_LIMIT.' '.DEFAULT_GAS_PRICE.' '.$address)),true)["txid"]);           
+            $results[]=array('from'=>$address,'to'=>MAIN_HRC_ADDRESS,'Tokens'=>$amount,'txid'=>json_decode(trim(sendCmd('sendtocontract '.TOKEN_CONTRACT_ADDRESS.' '.'a9059cbb'.to32bytesArg(addressToHash160(MAIN_HRC_ADDRESS)).to32bytesArg(addDecimals($amount)).' 0 '.DEFAULT_GAS_LIMIT.' '.DEFAULT_GAS_PRICE.' '.$address)),true)["txid"]);           
             $count++;
             if($count>MAX_NUMBER_OF_MOVE_DEPOSITS_PER_RUN)break;
         }
